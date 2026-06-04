@@ -8,17 +8,18 @@ const bootstrapAdmin = require('../src/config/bootstrapAdmin')
 
 let bootstrapPromise = null
 
-async function prepareApp() {
-  await connectDatabase()
-
+function warmBootstrapAdmin() {
   if (!bootstrapPromise) {
-    bootstrapPromise = bootstrapAdmin()
+    bootstrapPromise = bootstrapAdmin().finally(() => {
+      bootstrapPromise = null
+    })
   }
 
-  await bootstrapPromise
+  return bootstrapPromise
 }
 
 module.exports = async (req, res) => {
-  await prepareApp()
+  await connectDatabase()
+  void warmBootstrapAdmin()
   return app(req, res)
 }
