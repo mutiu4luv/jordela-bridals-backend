@@ -22,7 +22,7 @@ router.post('/', async (req, res, next) => {
 
     const createdSubmission = await FormSubmission.create({
       ...req.body,
-      submittedBy: req.user?._id ?? null,
+      submittedBy: null,
     })
 
     return res.status(201).json({

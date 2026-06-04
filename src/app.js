@@ -7,9 +7,13 @@ const app = express()
 
 const defaultAllowedOrigins = new Set([
   'https://jodella-bridals.vercel.app',
+  'https://jordela-bridals.vercel.app',
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
+  'http://127.0.0.1:3000',
 ])
 
 if (process.env.CORS_ORIGIN) {
@@ -19,21 +23,26 @@ if (process.env.CORS_ORIGIN) {
     .forEach((origin) => defaultAllowedOrigins.add(origin))
 }
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin) {
-        return callback(null, true)
-      }
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true)
+    }
 
-      const isLocalhost = /^https?:\/\/localhost(?::\d+)?$/.test(origin)
-      const isAllowed = defaultAllowedOrigins.has(origin) || isLocalhost
+    const normalizedOrigin = origin.trim()
+    const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?$/.test(normalizedOrigin)
+    const isAllowed = defaultAllowedOrigins.has(normalizedOrigin) || isLocalhost
 
-      return callback(null, isAllowed)
-    },
-    credentials: false,
-  }),
-)
+    return callback(null, isAllowed)
+  },
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false,
+  optionsSuccessStatus: 204,
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(express.json({ limit: '2mb' }))
 
 app.get('/', (_req, res) => {
