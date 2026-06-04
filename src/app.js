@@ -36,8 +36,20 @@ app.use(
 )
 app.use(express.json({ limit: '2mb' }))
 
+app.get('/', (_req, res) => {
+  res.send('Jodella backend API is running.')
+})
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
+})
+
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain').send('User-agent: *\nDisallow: /')
+})
+
+app.get('/favicon.ico', (_req, res) => {
+  res.status(204).end()
 })
 
 app.use('/api/auth', authRouter)

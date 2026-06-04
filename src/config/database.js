@@ -1,14 +1,31 @@
 const mongoose = require('mongoose')
 
-async function connectDatabase() {
-  const uri = process.env.MONGODB_URI
+const MONGODB_URI = process.env.MONGODB_URI
 
-  if (!uri) {
-    throw new Error('MONGODB_URI is missing from the environment.')
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI is missing from the environment.')
+}
+
+let cached = global.mongooseConnection
+
+if (!cached) {
+  cached = global.mongooseConnection = { conn: null, promise: null }
+}
+
+async function connectDatabase() {
+  if (cached.conn) {
+    return cached.conn
   }
 
-  mongoose.set('strictQuery', true)
-  await mongoose.connect(uri)
+  if (!cached.promise) {
+    mongoose.set('strictQuery', true)
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    })
+  }
+
+  cached.conn = await cached.promise
+  return cached.conn
 }
 
 module.exports = connectDatabase
