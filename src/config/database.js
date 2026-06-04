@@ -1,31 +1,33 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const MONGODB_URI = process.env.MONGODB_URI
+const MONGODB_URI = process.env.MONGODB_URI;
+const dns = require("dns");
+dns.setDefaultResultOrder("ipv4first");
 
 if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI is missing from the environment.')
+  throw new Error("MONGODB_URI is missing from the environment.");
 }
 
-let cached = global.mongooseConnection
+let cached = global.mongooseConnection;
 
 if (!cached) {
-  cached = global.mongooseConnection = { conn: null, promise: null }
+  cached = global.mongooseConnection = { conn: null, promise: null };
 }
 
 async function connectDatabase() {
   if (cached.conn) {
-    return cached.conn
+    return cached.conn;
   }
 
   if (!cached.promise) {
-    mongoose.set('strictQuery', true)
+    mongoose.set("strictQuery", true);
     cached.promise = mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000,
-    })
+      serverSelectionTimeoutMS: 30000,
+    });
   }
 
-  cached.conn = await cached.promise
-  return cached.conn
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
 
-module.exports = connectDatabase
+module.exports = connectDatabase;

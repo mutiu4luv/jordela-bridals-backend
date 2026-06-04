@@ -1,28 +1,29 @@
-const dotenv = require("dotenv");
+const dotenv = require('dotenv')
 
-dotenv.config();
+dotenv.config()
 
-const app = require("./src/app");
-const connectDatabase = require("./src/config/database");
-const bootstrapAdmin = require("./src/config/bootstrapAdmin");
+const app = require('./src/app')
+const connectDatabase = require('./src/config/database')
+const bootstrapAdmin = require('./src/config/bootstrapAdmin')
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5000
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the Jodella backend!");
-});
+app.get('/', (_req, res) => {
+  res.send('Welcome to the Jodella backend!')
+})
 
-async function startServer() {
+async function warmDatabase() {
   try {
-    await connectDatabase();
-    await bootstrapAdmin();
-    app.listen(port, () => {
-      console.log(`Jodella backend listening on port ${port}`);
-    });
+    await connectDatabase()
+    await bootstrapAdmin()
+    console.log('Jodella database connection ready.')
   } catch (error) {
-    console.error("Unable to start server:", error);
-    process.exit(1);
+    console.error('Database connection failed:', error)
   }
 }
 
-startServer();
+app.listen(port, () => {
+  console.log(`Jodella backend listening on port ${port}`)
+})
+
+void warmDatabase()
