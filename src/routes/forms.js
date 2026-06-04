@@ -5,6 +5,22 @@ const { authenticateRequest, requireRole } = require('../middleware/auth')
 const router = express.Router()
 
 const requiredFields = ['brideName', 'bridePhone', 'weddingDate', 'customerSignature']
+const DEFAULT_PAGE_SIZE = 25
+const MAX_PAGE_SIZE = 100
+
+function readPageValue(value, fallbackValue) {
+  const parsedValue = Number.parseInt(String(value ?? fallbackValue), 10)
+  return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : fallbackValue
+}
+
+function readLimitValue(value) {
+  const parsedValue = Number.parseInt(String(value ?? DEFAULT_PAGE_SIZE), 10)
+  if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
+    return DEFAULT_PAGE_SIZE
+  }
+
+  return Math.min(parsedValue, MAX_PAGE_SIZE)
+}
 
 router.post('/', async (req, res, next) => {
   try {
@@ -34,15 +50,50 @@ router.post('/', async (req, res, next) => {
   }
 })
 
-router.get('/', authenticateRequest, requireRole('admin'), async (_req, res, next) => {
+router.get('/summary', authenticateRequest, requireRole('admin'), async (_req, res, next) => {
   try {
-    const submissions = await FormSubmission.find()
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .populate('submittedBy', 'name email role')
+    const [total, returned, latestSubmission] = await Promise.all([
+      FormSubmission.countDocuments(),
+      FormSubmission.countDocuments({ materialsReturned: true }),
+      FormSubmission.findOne().sort({ createdAt: -1 }).select('createdAt'),
+    ])
+
+    return res.json({
+      data: {
+        total,
+        returned,
+        pending: total - returned,
+        latestCreatedAt: latestSubmission?.createdAt ?? null,
+      },
+    })
+  } catch (error) {
+    return next(error)
+  }
+})
+
+router.get('/', authenticateRequest, requireRole('admin'), async (req, res, next) => {
+  try {
+    const page = readPageValue(req.query.page, 1)
+    const limit = readLimitValue(req.query.limit)
+    const skip = (page - 1) * limit
+
+    const [submissions, total] = await Promise.all([
+      FormSubmission.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('submittedBy', 'name email role'),
+      FormSubmission.countDocuments(),
+    ])
 
     return res.json({
       data: submissions,
+      pagination: {
+        page,
+        limit,
+        total,
+        hasMore: skip + submissions.length < total,
+      },
     })
   } catch (error) {
     return next(error)
