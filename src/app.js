@@ -5,13 +5,33 @@ const formsRouter = require('./routes/forms')
 
 const app = express()
 
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
-  : []
+const defaultAllowedOrigins = new Set([
+  'https://jodella-bridals.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://localhost:3000',
+])
+
+if (process.env.CORS_ORIGIN) {
+  process.env.CORS_ORIGIN.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .forEach((origin) => defaultAllowedOrigins.add(origin))
+}
 
 app.use(
   cors({
-    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true)
+      }
+
+      const isLocalhost = /^https?:\/\/localhost(?::\d+)?$/.test(origin)
+      const isAllowed = defaultAllowedOrigins.has(origin) || isLocalhost
+
+      return callback(null, isAllowed)
+    },
+    credentials: false,
   }),
 )
 app.use(express.json({ limit: '2mb' }))

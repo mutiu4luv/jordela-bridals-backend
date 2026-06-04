@@ -38,7 +38,7 @@ const formSubmissionSchema = new Schema(
     submittedBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      default: null,
     },
   },
   {

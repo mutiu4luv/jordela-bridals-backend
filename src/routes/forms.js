@@ -6,7 +6,7 @@ const router = express.Router()
 
 const requiredFields = ['brideName', 'bridePhone', 'weddingDate', 'customerSignature']
 
-router.post('/', authenticateRequest, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
     const missingFields = requiredFields.filter((field) => {
       const value = req.body?.[field]
@@ -22,7 +22,7 @@ router.post('/', authenticateRequest, async (req, res, next) => {
 
     const createdSubmission = await FormSubmission.create({
       ...req.body,
-      submittedBy: req.user._id,
+      submittedBy: req.user?._id ?? null,
     })
 
     return res.status(201).json({
