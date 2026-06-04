@@ -21,12 +21,24 @@ async function connectDatabase() {
 
   if (!cached.promise) {
     mongoose.set("strictQuery", true);
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 30000,
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 30000, // Drop down to 30s so it doesn't max out Vercel's 10s limit
+        bufferCommands: false,
+      })
+      .then((mongooseInstance) => {
+        console.log("=> MongoDB connected successfully.");
+        return mongooseInstance;
+      });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+    throw error;
+  }
+
   return cached.conn;
 }
 

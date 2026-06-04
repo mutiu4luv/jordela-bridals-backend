@@ -54,6 +54,17 @@ app.use((req, res, next) => {
   return next();
 });
 app.use(express.json({ limit: "2mb" }));
+const connectDatabase = require("./config/database");
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDatabase();
+    next();
+  } catch (error) {
+    console.error("Database connection middleware error:", error);
+    return res.status(500).json({ message: "Database connection failed." });
+  }
+});
 
 app.get("/", (_req, res) => {
   res.send("Jodella backend API is running.");
