@@ -1,38 +1,40 @@
-const bcrypt = require('bcryptjs')
-const User = require('../models/User')
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 
 async function bootstrapAdmin() {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL
-    const adminPassword = process.env.ADMIN_PASSWORD
-    const adminName = process.env.ADMIN_NAME || 'Admin'
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminName = process.env.ADMIN_NAME || "Admin";
 
     if (!adminEmail || !adminPassword) {
-      return
+      return;
     }
 
-    const existingAdmin = await User.findOne({ email: adminEmail.toLowerCase() })
+    const existingAdmin = await User.findOne({
+      email: adminEmail.toLowerCase(),
+    });
 
     if (existingAdmin) {
-      if (existingAdmin.role !== 'admin') {
-        existingAdmin.role = 'admin'
-        await existingAdmin.save()
+      if (existingAdmin.role !== "admin") {
+        existingAdmin.role = "admin";
+        await existingAdmin.save();
       }
 
-      return
+      return;
     }
 
-    const hashedPassword = await bcrypt.hash(adminPassword, 10)
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
     await User.create({
       name: adminName,
       email: adminEmail.toLowerCase(),
       password: hashedPassword,
-      role: 'admin',
-    })
+      role: "admin",
+    });
   } catch (error) {
-    console.error('Admin bootstrap skipped:', error)
+    console.error("Admin bootstrap skipped:", error);
   }
 }
 
-module.exports = bootstrapAdmin
+module.exports = bootstrapAdmin;
