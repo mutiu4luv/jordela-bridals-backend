@@ -1,0 +1,49 @@
+const { Schema, model } = require('mongoose')
+
+const formSubmissionSchema = new Schema(
+  {
+    brideName: { type: String, required: true, trim: true },
+    bridePhone: { type: String, required: true, trim: true },
+    homeAddress: { type: String, trim: true, default: '' },
+    socialAddress: { type: String, trim: true, default: '' },
+    weddingDate: { type: String, required: true, trim: true },
+    husbandName: { type: String, trim: true, default: '' },
+    husbandPhone: { type: String, trim: true, default: '' },
+    husbandAddress: { type: String, trim: true, default: '' },
+    stateCity: { type: String, trim: true, default: '' },
+    churchAddress: { type: String, trim: true, default: '' },
+    weddingCardCopyType: { type: String, trim: true, default: '' },
+    packageName: { type: String, trim: true, default: '' },
+    packageAllItems: { type: Boolean, default: true },
+    packageItemA: { type: String, trim: true, default: '' },
+    packageItemB: { type: String, trim: true, default: '' },
+    packageItemC: { type: String, trim: true, default: '' },
+    packageItemD: { type: String, trim: true, default: '' },
+    packageItemE: { type: String, trim: true, default: '' },
+    packageItemF: { type: String, trim: true, default: '' },
+    removedItems: { type: String, trim: true, default: '' },
+    cautionFeeAcknowledged: { type: Boolean, default: false },
+    identificationSubmitted: { type: Boolean, default: false },
+    adjustmentAcknowledged: { type: Boolean, default: false },
+    returnDurationAcknowledged: { type: Boolean, default: false },
+    pickupAcknowledged: { type: Boolean, default: false },
+    fireworksAcknowledged: { type: Boolean, default: false },
+    cancellationAcknowledged: { type: Boolean, default: false },
+    damagedItemAcknowledged: { type: Boolean, default: false },
+    valueAcknowledged: { type: Boolean, default: false },
+    customerSignature: { type: String, required: true, trim: true },
+    consultantSignature: { type: String, trim: true, default: '' },
+    mdSignature: { type: String, trim: true, default: '' },
+    signatureDate: { type: String, trim: true, default: '' },
+    submittedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  },
+)
+
+module.exports = model('FormSubmission', formSubmissionSchema)
