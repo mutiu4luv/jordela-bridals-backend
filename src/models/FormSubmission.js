@@ -31,6 +31,7 @@ const formSubmissionSchema = new Schema(
     cancellationAcknowledged: { type: Boolean, default: false },
     damagedItemAcknowledged: { type: Boolean, default: false },
     valueAcknowledged: { type: Boolean, default: false },
+    materialsReturned: { type: Boolean, default: false },
     customerSignature: { type: String, required: true, trim: true },
     consultantSignature: { type: String, trim: true, default: '' },
     mdSignature: { type: String, trim: true, default: '' },

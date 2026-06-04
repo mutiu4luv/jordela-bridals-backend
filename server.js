@@ -8,10 +8,6 @@ const bootstrapAdmin = require('./src/config/bootstrapAdmin')
 
 const port = process.env.PORT || 5000
 
-app.get('/', (_req, res) => {
-  res.send('Welcome to the Jodella backend!')
-})
-
 async function warmDatabase() {
   try {
     await connectDatabase()
@@ -22,8 +18,12 @@ async function warmDatabase() {
   }
 }
 
-app.listen(port, () => {
-  console.log(`Jodella backend listening on port ${port}`)
-})
+if (process.env.VERCEL) {
+  module.exports = app
+} else {
+  app.listen(port, () => {
+    console.log(`Jodella backend listening on port ${port}`)
+  })
 
-void warmDatabase()
+  void warmDatabase()
+}
