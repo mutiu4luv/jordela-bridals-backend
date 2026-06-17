@@ -36,6 +36,13 @@ router.post('/', async (req, res, next) => {
       })
     }
 
+    if (req.body?.policyAcknowledged !== true) {
+      return res.status(400).json({
+        message: 'You must acknowledge the policy before submitting.',
+        missingFields: ['policyAcknowledged'],
+      })
+    }
+
     const createdSubmission = await FormSubmission.create({
       ...req.body,
       submittedBy: null,
