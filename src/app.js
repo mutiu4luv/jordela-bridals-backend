@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const authRouter = require("./routes/auth");
 const formsRouter = require("./routes/forms");
+const uploadsRouter = require("./routes/uploads");
 
 const app = express();
 
@@ -56,7 +57,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "2mb" }));
 const connectDatabase = require("./config/database");
 
-app.use(async (req, res, next) => {
+async function attachDatabase(req, res, next) {
   try {
     await connectDatabase();
     next();
@@ -64,7 +65,7 @@ app.use(async (req, res, next) => {
     console.error("Database connection middleware error:", error);
     return res.status(500).json({ message: "Database connection failed." });
   }
-});
+}
 
 app.get("/", (_req, res) => {
   res.send("Jodella backend API is running.");
@@ -82,8 +83,9 @@ app.get("/favicon.ico", (_req, res) => {
   res.status(204).end();
 });
 
-app.use("/api/auth", authRouter);
-app.use("/api/forms", formsRouter);
+app.use("/api/uploads", uploadsRouter);
+app.use("/api/auth", attachDatabase, authRouter);
+app.use("/api/forms", attachDatabase, formsRouter);
 
 app.use((error, _req, res, _next) => {
   console.error(error);

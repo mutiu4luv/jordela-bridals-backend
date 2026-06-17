@@ -4,7 +4,7 @@ const { authenticateRequest, requireRole } = require('../middleware/auth')
 
 const router = express.Router()
 
-const requiredFields = ['brideName', 'bridePhone', 'weddingDate', 'customerSignature']
+const requiredFields = ['brideName', 'bridePhone', 'weddingDate', 'customerSignature', 'idCardUrl', 'packageName']
 const DEFAULT_PAGE_SIZE = 25
 const MAX_PAGE_SIZE = 100
 
@@ -40,6 +40,13 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({
         message: 'You must acknowledge the policy before submitting.',
         missingFields: ['policyAcknowledged'],
+      })
+    }
+
+    if (typeof req.body?.idCardUrl !== 'string' || req.body.idCardUrl.trim().length === 0) {
+      return res.status(400).json({
+        message: 'Please upload a valid ID card before submitting.',
+        missingFields: ['idCardUrl'],
       })
     }
 
