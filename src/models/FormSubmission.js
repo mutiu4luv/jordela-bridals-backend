@@ -35,10 +35,6 @@ const formSubmissionSchema = new Schema(
     idCardUrl: { type: String, trim: true, default: '' },
     idCardName: { type: String, trim: true, default: '' },
     materialsReturned: { type: Boolean, default: false },
-    customerSignature: { type: String, required: true, trim: true },
-    consultantSignature: { type: String, trim: true, default: '' },
-    mdSignature: { type: String, trim: true, default: '' },
-    signatureDate: { type: String, trim: true, default: '' },
     submittedBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',

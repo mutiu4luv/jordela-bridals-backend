@@ -4,7 +4,7 @@ const { authenticateRequest, requireRole } = require('../middleware/auth')
 
 const router = express.Router()
 
-const requiredFields = ['brideName', 'bridePhone', 'weddingDate', 'customerSignature', 'idCardUrl', 'packageName']
+const requiredFields = ['brideName', 'bridePhone', 'weddingDate', 'idCardUrl', 'packageName']
 const DEFAULT_PAGE_SIZE = 25
 const MAX_PAGE_SIZE = 100
 
